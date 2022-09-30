@@ -15,4 +15,4 @@ jobs:
         id: semgrep
         uses: returntocorp/semgrep-action@v1
         with:
-          publishToken: ${{ secrets.SEMGREP_PUBLISH_TOKEN }}
+          publishToken: ${{ secrets.SEMGREP_INTERNAL_KEY }}
