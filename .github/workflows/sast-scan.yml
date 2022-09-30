@@ -1,0 +1,18 @@
+name: SAST Scanning using Semgrep.dev
+on:
+  workflow_call:
+    secrets:
+      SEMGREP_INTERNAL_KEY:
+        required: true
+jobs:
+  semgrep:
+    runs-on: ubuntu-latest
+    name: security-sast-semgrep
+    if: github.actor != 'dependabot[bot]'
+    steps:
+      - uses: actions/checkout@v3
+      - name: Semgrep
+        id: semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          publishToken: ${{ secrets.SEMGREP_PUBLISH_TOKEN }}
