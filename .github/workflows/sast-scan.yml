@@ -16,5 +16,3 @@ jobs:
         uses: returntocorp/semgrep-action@v1
         with:
           publishToken: ${{ secrets.SEMGREP_INTERNAL_KEY }}
-          bump_version_scheme: minor
-          tag_prefix: v
