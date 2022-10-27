@@ -17,3 +17,4 @@ jobs:
         with:
           publishToken: ${{ secrets.SEMGREP_INTERNAL_KEY }}
           bump_version_scheme: minor
+          tag_prefix: v
