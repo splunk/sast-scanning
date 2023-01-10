@@ -2,7 +2,7 @@ name: SAST Scanning using Semgrep.dev
 on:
   workflow_call:
     secrets:
-      SEMGREP_INTERNAL_KEY:
+      SEMGREP_KEY:
         required: true
 jobs:
   semgrep:
