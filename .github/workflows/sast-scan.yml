@@ -8,11 +8,19 @@ jobs:
   semgrep:
     runs-on: ubuntu-latest
     name: security-sast-semgrep
+    container:
+      # A Docker image with Semgrep installed. Do not change this.
+      image: returntocorp/semgrep
+    env:
+      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_KEY }}
     if: github.actor != 'dependabot[bot]'
     steps:
       - uses: actions/checkout@v3
-      - name: Semgrep
-        id: semgrep
-        uses: returntocorp/semgrep-action@v1
+      - run: semgrep ci --verbose --json --output=semgrep-run.json
+      - name: upload-artifact
+        if: always()
+        uses: actions/upload-artifact@v3
         with:
-          publishToken: ${{ secrets.SEMGREP_KEY }}
+          name: semgrep-run.json
+          path: semgrep-run.json
+          retention-days: 10
