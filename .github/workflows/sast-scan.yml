@@ -1,26 +1,40 @@
-name: SAST Scanning using Semgrep.dev
+name: SAST Scan using Semgrep CI
+
 on:
   workflow_call:
     secrets:
       SEMGREP_KEY:
         required: true
+
 jobs:
-  semgrep:
+  sast-scan:
     runs-on: ubuntu-latest
-    name: security-sast-semgrep
+    name: sast-scan
+
     container:
       # A Docker image with Semgrep installed. Do not change this.
-      image: returntocorp/semgrep
-    env:
-      SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_KEY }}
-    if: github.actor != 'dependabot[bot]'
+      image: semgrep/semgrep
+
+    # Skip any PR created by dependabot to avoid permission issues:
+    if: (github.actor != 'dependabot[bot]')
+
     steps:
       - uses: actions/checkout@v4
-      - run: semgrep ci --verbose --json --output=semgrep-run.json
+      - run: semgrep ci --sarif-output=semgrep.sarif --json-output=semgrep_output.json
+        env:
+          # Connect to Semgrep AppSec Platform through your SEMGREP_APP_TOKEN.
+          SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_KEY }}
+
+      - name: Upload SARIF file for GitHub Advanced Security Dashboard
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: semgrep.sarif
+        if: always()
+
       - name: upload-artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: semgrep-run.json
-          path: semgrep-run.json
+          name: semgrep_output.json
+          path: semgrep_output.json
           retention-days: 10
