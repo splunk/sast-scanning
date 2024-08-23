@@ -5,6 +5,10 @@ on:
     secrets:
       SEMGREP_KEY:
         required: true
+    inputs:
+      upload_results:
+        required: false
+        type: boolean
 
 jobs:
   sast-scan:
@@ -25,14 +29,13 @@ jobs:
           # Connect to Semgrep AppSec Platform through your SEMGREP_APP_TOKEN.
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_KEY }}
 
-      - name: Upload SARIF file for GitHub Advanced Security Dashboard
+      - name: Upload results to GitHub Advanced Security Dashboard
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: semgrep.sarif
-        if: always()
+        if: ${{ inputs.upload_results }}
 
-      - name: upload-artifact
-        if: always()
+      - name: Upload Semgrep JSON as artifact
         uses: actions/upload-artifact@v4
         with:
           name: semgrep_output.json

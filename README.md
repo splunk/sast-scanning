@@ -23,7 +23,9 @@ jobs:
   sast-scan:
     uses: splunk/sast-scanning/.github/workflows/sast-scan.yml@main
     secrets: inherit #Ensures that this project is able to access Organization level secrets which are necessary to run Semgrep Scans.
-    permissions: write-all # Give permissions to allow uploading results to GitHub Advanced Security Dashboard
+    #permissions: write-all # Give permissions to allow uploading results to GitHub Advanced Security Dashboard. Only required if upload_results is true.
+    #with:
+    #  upload_results: true # Optional: If true it will upload results to GitHub Advanced Security Dashboard. If there are findings will fail the pipeline.
 on:
   push:
     branches:
