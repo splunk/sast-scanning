@@ -6,9 +6,10 @@ on:
       SEMGREP_KEY:
         required: true
     inputs:
-      upload_results:
+      block_mode:
         required: false
-        type: boolean
+        default: 'off'
+        type: string
 
 jobs:
   sast-scan:
@@ -29,15 +30,28 @@ jobs:
           # Connect to Semgrep AppSec Platform through your SEMGREP_APP_TOKEN.
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_KEY }}
 
-      - name: Upload results to GitHub Advanced Security Dashboard
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: semgrep.sarif
-        if: ${{ inputs.upload_results }}
-
       - name: Upload Semgrep JSON as artifact
         uses: actions/upload-artifact@v4
         with:
           name: semgrep_output.json
           path: semgrep_output.json
           retention-days: 10
+
+      - name: Run Block Mode
+        run: |
+          #Block job if there are vulnerabilities depending in block mode
+    
+          total_findings=$(jq '.results | length' "semgrep_output.json")
+          error_findings=$(jq '[.results[] | select(.end.severity == "ERROR")] | length' "semgrep_output.json")
+
+          if [[ "${{ inputs.block_mode }}" == "policy" && "$error_findings" -gt 0 ]]; then
+              echo "********** Job failed due to high vulnerabilities found and block mode set to 'policy' **********"
+              echo "High Severity Vulnerabilities: $error_findings"
+              exit 1
+          fi
+
+          if [[ "${{ inputs.block_mode }}" == "on" && "$total_findings" -gt 0 ]]; then
+              echo "********** Job failed due to vulnerabilities found and block mode set to 'on' **********"
+              echo "Vulnerabilities: $total_findings"
+              exit 1
+          fi

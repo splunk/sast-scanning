@@ -23,9 +23,65 @@ jobs:
   sast-scan:
     uses: splunk/sast-scanning/.github/workflows/sast-scan.yml@main
     secrets: inherit #Ensures that this project is able to access Organization level secrets which are necessary to run Semgrep Scans.
-    #permissions: write-all # Give permissions to allow uploading results to GitHub Advanced Security Dashboard. Only required if upload_results is true.
-    #with:
-    #  upload_results: true # Optional: If true it will upload results to GitHub Advanced Security Dashboard. If there are findings will fail the pipeline.
+on:
+  push:
+    branches:
+      - "main" #Add the main branch of your project
+  pull_request:
+    branches: [main]
+```
+
+#### Block/Fail the SAST job if there are vulnerabilities found ?
+Currently, there are 3 modes to operate on open vulnerabilities using the variable "block_mode"
+
+Value | Description |
+---------:|:------|
+`off` | (Default). Using this flag will not fail the job
+`policy` | Any High severity vulnerability, i.e., Semgrep High Findings. > 0 will fail the job
+`on` | Any High, Medium, Low severity will fail the pipeline.
+
+##### Examples
+
+```yaml
+name: SAST Scan
+jobs:
+  sast-scan:
+    uses: splunk/sast-scanning/.github/workflows/sast-scan.yml@main
+    secrets: inherit #Ensures that this project is able to access Organization level secrets which are necessary to run Semgrep Scans.
+    with:
+      block_mode: "off" # Block mode turned off
+on:
+  push:
+    branches:
+      - "main" #Add the main branch of your project
+  pull_request:
+    branches: [main]
+```
+
+```yaml
+name: SAST Scan
+jobs:
+  sast-scan:
+    uses: splunk/sast-scanning/.github/workflows/sast-scan.yml@main
+    secrets: inherit #Ensures that this project is able to access Organization level secrets which are necessary to run Semgrep Scans.
+    with:
+      block_mode: "on" # Block mode turned on to fail on any high,medium,low vulnerabilities
+on:
+  push:
+    branches:
+      - "main" #Add the main branch of your project
+  pull_request:
+    branches: [main]
+```
+
+```yaml
+name: SAST Scan
+jobs:
+  sast-scan:
+    uses: splunk/sast-scanning/.github/workflows/sast-scan.yml@main
+    secrets: inherit #Ensures that this project is able to access Organization level secrets which are necessary to run Semgrep Scans.
+    with:
+      block_mode: "policy" # Alert mode turned to fail on policy set by prodsec team
 on:
   push:
     branches:
