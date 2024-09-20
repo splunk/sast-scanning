@@ -42,7 +42,7 @@ jobs:
           #Block job if there are vulnerabilities depending in block mode
     
           total_findings=$(jq '.results | length' "semgrep_output.json")
-          error_findings=$(jq '[.results[] | select(.end.severity == "ERROR")] | length' "semgrep_output.json")
+          error_findings=$(jq '[.results[] | select(.extra.severity == "ERROR")] | length' "semgrep_output.json")
 
           if [[ "${{ inputs.block_mode }}" == "policy" && "$error_findings" -gt 0 ]]; then
               echo "********** Job failed due to high vulnerabilities found and block mode set to 'policy' **********"
