@@ -24,14 +24,14 @@ jobs:
     if: (github.actor != 'dependabot[bot]')
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: semgrep ci --sarif-output=semgrep.sarif --json-output=semgrep_output.json
         env:
           # Connect to Semgrep AppSec Platform through your SEMGREP_APP_TOKEN.
           SEMGREP_APP_TOKEN: ${{ secrets.SEMGREP_KEY }}
 
       - name: Upload Semgrep JSON as artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: semgrep_output.json
           path: semgrep_output.json
